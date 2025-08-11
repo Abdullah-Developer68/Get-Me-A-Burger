@@ -1,23 +1,28 @@
 "use client";
-import React from "react";
-import { useSession, signIn, signOut } from "next-auth/react";
+import React, { useEffect } from "react";
+import { useSession, signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
   const { data: session } = useSession();
+  const router = useRouter();
 
-  if (session) {
-    return (
-      <>
-        Signed in as {session.user.name} <br />
-        <button
-          onClick={() => signOut()}
-          className="bg-red-500 px-4 py-2 rounded-md cursor-pointer"
-        >
-          Sign out
-        </button>
-      </>
-    );
-  }
+  // React expects no side effects to run during rendering phase of the component, but can not can not stop us from doing this.
+  // First the login page renders and user clicks the login with github, so an update to session was made
+  // and on every update react will rerender the entire component now the issue is in the 2nd render phase we
+  // are immediatly redirecting to dashboard which is a side effect and it will still work but react wants it
+  // to happen after the login component finishes rendering so to avoid warnings we add the redirecting in useEffect
+  // so that redirecting happens after the rendering of the login component has been finished because session is in
+  // dependency array and rendering was caused due to its update.
+
+  // If all of this is not done then in dev mode we risk double navigation but in production it will usually work fine
+  useEffect(() => {
+    if (session) {
+      // used replace to prevent the user from going back to the login page using browser back button
+      // .push will add the login page to the browser history, so user can go back
+      router.replace("/dashboard");
+    }
+  }, [session, router]);
 
   return (
     <>
@@ -167,7 +172,12 @@ const Login = () => {
             <span>Continue with Facebook</span>
           </button>
 
-          <button className="flex items-center  border  rounded-lg shadow-md max-w-xs px-6 py-2 text-sm font-medium  hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 bg-white">
+          <button
+            className="flex items-center  border  rounded-lg shadow-md max-w-xs px-6 py-2 text-sm font-medium cursor-pointer  hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 bg-white"
+            onClick={() => {
+              signIn("github");
+            }}
+          >
             <svg
               className="h-6 w-6 mr-2"
               xmlns="http://www.w3.org/2000/svg"
@@ -209,7 +219,7 @@ const Login = () => {
             <span>Continue with Github</span>
           </button>
 
-          <button className="flex items-center  border  rounded-lg shadow-md max-w-xs px-6 py-2 text-sm font-medium  hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 bg-white">
+          <button className="flex items-center  border  rounded-lg shadow-md max-w-xs px-6 py-2 text-sm font-medium cursor-pointer hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 bg-white">
             <svg
               className="h-6 w-6 mr-2"
               xmlns="http://www.w3.org/2000/svg"

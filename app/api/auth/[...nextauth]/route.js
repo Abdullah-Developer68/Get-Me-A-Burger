@@ -5,6 +5,9 @@ import GitHub from "next-auth/providers/github";
 // import Facebook from "next-auth/providers/facebook";
 // import Twitter from "next-auth/providers/twitter";
 // import LinkedIn from "next-auth/providers/linkedin";
+import User from "@/models/User";
+import Payment from "@models/Payment";
+import dbConnect from "@db/dbConnect";
 
 export const authOptions = {
   providers: [
@@ -13,6 +16,39 @@ export const authOptions = {
       clientSecret: process.env.GITHUB_SECRET,
     }),
   ],
+
+  callbacks: {
+    async signIn({ user, account, profile }) {
+      if (account.provider == "github") {
+        await dbConnect();
+        const primaryEmail = user?.email || profile?.email;
+        if (!primaryEmail) return false;
+
+        const existing = await User.findOne({ email: primaryEmail });
+        if (!existing) {
+          await User.create({
+            email: primaryEmail,
+            name: user?.name || profile?.name || "",
+            username: primaryEmail.split("@")[0],
+          });
+        }
+      }
+
+      return true; // if this is not written an error comes that you do not have permission by the app to sign in.
+    },
+    async session({ session, user, token }) {
+      await dbConnect();
+      const userExist = await User.findOne({ email: session.user.email });
+      if (userExist?.username) session.user.name = userExist.username;
+      return session;
+    },
+    async redirect({ url, baseUrl }) {
+      return baseUrl;
+    },
+    async jwt({ token, user, account, profile, isNewUser }) {
+      return token;
+    },
+  },
 };
 
 const handler = NextAuth(authOptions);

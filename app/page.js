@@ -7,7 +7,7 @@ export default function Home() {
           <span>
             <img className="rounded-full h-32" src={"/burger-dance.gif"} />
           </span>
-          <div className="font-bold text-5xl">Buy me a burger! </div>
+          <div className="font-bold text-5xl">Buy me a coke! </div>
 
           <div className="flex">
             <button className="ml-4 bg-red-500 text-black px-4 py-2 rounded">
@@ -25,7 +25,7 @@ export default function Home() {
         {/* section 2 */}
         <div className="flex flex-col justify-center items-center h-[47vh] text-white gap-2">
           <h1 className="text-white font-bold text-3xl mb-10 text-center">
-            Your Fans can buy you a Burger
+            Your Fans can buy you a Coke
           </h1>
           <div className="flex items-center gap-44 text-white text-center">
             {/* man */}

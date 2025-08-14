@@ -1,14 +1,14 @@
-import { stripe } from "@lib/stripe";
+"use server";
+import { stripe } from "../../lib/stripe";
 import { NextResponse } from "next/server";
 
-export async function POST(request) {
-  // This api route is taking the required info for the donation and is creating a checkout session with Stripe
+export const createCheckoutSession = async (request) => {
   try {
     const { amount, name, message, username } = await request.json();
-
-    if (!process.env.STRIPE_SECRET_KEY) {
+    // validation
+    if (!process.env.Stripe_SECRET_KEY) {
       return NextResponse.json(
-        { error: "Missing STRIPE_SECRET_KEY" },
+        { error: "Missing Stripe secret key" },
         { status: 500 }
       );
     }
@@ -17,7 +17,9 @@ export async function POST(request) {
       return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
     }
 
+    // setting up data
     const origin = request.nextUrl?.origin ?? "";
+
     const safeUsername =
       typeof username === "string" && username.length > 0
         ? username
@@ -27,17 +29,18 @@ export async function POST(request) {
     const supporterMessage =
       typeof message === "string" && message.length > 0 ? message : undefined;
 
-    const session = await stripe.checkout.sessions.create({
+    // creating Checkout Session
+    const session = await stripe.checkout.session.create({
       mode: "payment",
       payment_method_types: ["card"],
       line_items: [
         {
           price_data: {
-            currency: "inr",
+            currency: "usd",
             product_data: {
               name: `Support @${safeUsername}`,
               description: supporterMessage
-                ? `${supporterName}: ${supporterMessage}`
+                ? `${supporterName}:${supporterMessage}`
                 : undefined,
             },
             unit_amount: Math.round(Number(amount) * 100), // smallest currency unit
@@ -53,12 +56,11 @@ export async function POST(request) {
       success_url: `${origin}/${safeUsername}?success=1`,
       cancel_url: `${origin}/${safeUsername}?canceled=1`,
     });
-
     return NextResponse.json({ url: session.url });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
-      { error: error?.message || "Unexpected error" },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   }
-}
+};

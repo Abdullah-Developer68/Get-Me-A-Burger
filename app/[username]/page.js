@@ -16,6 +16,7 @@ const Username = () => {
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // this sends a req to the checkout api route for donating money via stripe
   const startCheckout = async (amt) => {
     if (!amt) return;
     setIsLoading(true);

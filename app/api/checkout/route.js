@@ -33,7 +33,7 @@ export async function POST(request) {
       line_items: [
         {
           price_data: {
-            currency: "inr",
+            currency: "usd",
             product_data: {
               name: `Support @${safeUsername}`,
               description: supporterMessage

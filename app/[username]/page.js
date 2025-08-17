@@ -154,7 +154,7 @@ const Username = () => {
                     disabled={isLoading}
                     className="rounded-md bg-gray-800 border border-gray-700 px-3 py-1 text-xs text-gray-200 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    Pay ₹{amt}
+                    Pay {amt}$
                   </button>
                 ))}
               </div>

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
 const Username = () => {
@@ -15,6 +15,7 @@ const Username = () => {
   const [supporterMessage, setSupporterMessage] = useState("");
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [payData, setPayData] = useState([]);
 
   // this sends a req to the checkout api route for donating money via stripe
   const startCheckout = async (amt) => {
@@ -36,6 +37,8 @@ const Username = () => {
       if (!res.ok) throw new Error(data?.error || "Failed to create session");
 
       if (data?.url) {
+        // stripe returns a url for its checkout page and we are redirecting to it.
+        // For performance we often use useNavigate hook but this is an external page and not a part of the application so for this full browser navigation is required.
         window.location.href = data.url;
       }
     } catch (err) {
@@ -44,6 +47,23 @@ const Username = () => {
       setIsLoading(false);
     }
   };
+
+  const getRecentPaymentInfo = async () => {
+    const res = await fetch("/api/payment", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await res.json();
+    setPayData(data);
+    console.log("Recent payment info:", payData);
+  };
+
+  useEffect(() => {
+    getRecentPaymentInfo();
+  }, []);
 
   return (
     <>
@@ -81,32 +101,15 @@ const Username = () => {
           <div className="w-full rounded-lg bg-gray-900/70 border border-gray-700 p-5">
             <h3 className="text-lg font-semibold mb-4">Top 10 Supporters</h3>
             <ul className="space-y-3 text-gray-200 text-sm">
-              {[
-                { name: "Vijay", amount: 46666, message: "Loan ke paise hain" },
-                { name: "Harry", amount: 45500, message: "Le lo bhai" },
-                { name: "Kriti", amount: 566, message: "Rakh lo bhaiya" },
-                { name: "Harry", amount: 200, message: "200 rs le lo" },
-                {
-                  name: "Shubh",
-                  amount: 122,
-                  message: "bhai rakh lena toffee kha lena",
-                },
-                { name: "Rohan", amount: 46, message: "nahi dunga" },
-                { name: "Harry", amount: 45, message: "testing" },
-                { name: "Harry", amount: 45, message: "sdsfds" },
-                {
-                  name: "Priya",
-                  amount: 4,
-                  message: "Thanks for providing this option",
-                },
-              ].map((s, idx) => (
+              {/* Loop over to display the most recent supporters */}
+              {payData.map((s, idx) => (
                 <li key={idx} className="flex items-start gap-3">
                   <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 border border-gray-700 text-xs">
                     🥤
                   </span>
                   <span>
                     <span className="font-medium">{s.name}</span> donated
-                    <span className="font-semibold"> ₹{s.amount}</span> with a
+                    <span className="font-semibold"> {s.amount} $</span> with a
                     message &quot;{s.message}&quot;
                   </span>
                 </li>

@@ -54,6 +54,7 @@ export async function POST(request) {
       cancel_url: `${origin}/${safeUsername}?canceled=1`,
     });
 
+    // sends the url to the frontend for it to redirect
     return NextResponse.json({ url: session.url });
   } catch (error) {
     return NextResponse.json(

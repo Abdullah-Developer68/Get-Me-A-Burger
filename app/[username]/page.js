@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
 const Username = () => {
+  // this is used to extract the URL parameters and a route/page can accept url paramters if the file is made using [filename]
   const routeParams = useParams();
   const username =
     typeof routeParams?.username === "string"
@@ -49,21 +50,26 @@ const Username = () => {
   };
 
   const getRecentPaymentInfo = async () => {
-    const res = await fetch("/api/payment", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    // GET requests shouldn't have a body. Send username as a query param instead.
+    const res = await fetch(
+      `/api/payment?username=${encodeURIComponent(username)}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     const data = await res.json();
     setPayData(data);
-    console.log("Recent payment info:", payData);
+    // log the response data (not the state variable immediately after setState)
+    console.log("Recent payment info:", data);
   };
 
   useEffect(() => {
     getRecentPaymentInfo();
-  }, []);
+  }, [username]);
 
   return (
     <>
@@ -83,7 +89,7 @@ const Username = () => {
               className="w-24 rounded-full"
             />
             <span className="flex flex-col gap-2 items-center justify-center text-center">
-              <p>@codewithharry.com</p>
+              <p>{username}</p>
               <p>Created animated Web novels!</p>
               <span className="flex gap-2 justify-center items-center">
                 <p>9000 Memebers .</p>
@@ -109,8 +115,12 @@ const Username = () => {
                   </span>
                   <span>
                     <span className="font-medium">{s.name}</span> donated
-                    <span className="font-semibold"> {s.amount} $</span> with a
-                    message &quot;{s.message}&quot;
+                    <span className="font-semibold">
+                      {" "}
+                      {/* amount is in cents so convert it to dollars */}
+                      {s.amount / 100} $
+                    </span>{" "}
+                    with a message &quot;{s.message}&quot;
                   </span>
                 </li>
               ))}

@@ -26,7 +26,7 @@ const Navbar = () => {
         {session ? (
           <>
             <div className="flex items-center gap-3">
-              <div className="flex flex-col items-center gap-3">
+              <div className="flex flex-col items-center gap-3 relative">
                 <button
                   id="dropdownDefaultButton"
                   data-dropdown-toggle="dropdown"
@@ -61,7 +61,7 @@ const Navbar = () => {
                   id="dropdown"
                   className={`${
                     showDropdown
-                      ? "z-10 mt-12 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700 absolute"
+                      ? "z-50 absolute top-12 right-0 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700"
                       : "hidden"
                   }`}
                 >
@@ -71,8 +71,22 @@ const Navbar = () => {
                   >
                     <li>
                       <Link
+                        href={`/`}
+                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                        onClick={() => {
+                          setShowDropdown(false);
+                        }}
+                      >
+                        Home
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
                         href={`/dashboard`}
                         className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                        onClick={() => {
+                          setShowDropdown(false);
+                        }}
                       >
                         Dashboard
                       </Link>
@@ -81,16 +95,11 @@ const Navbar = () => {
                       <Link
                         href={`/${session.user.name}`}
                         className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                        onClick={() => {
+                          setShowDropdown(false);
+                        }}
                       >
                         Your Page
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        href={`/settings`}
-                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                      >
-                        Settings
                       </Link>
                     </li>
 
@@ -121,3 +130,17 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+// Sequence:
+
+// mousedown → when you press the button
+
+// mouseup → when you release
+
+// click → only if press + release happened on the same element
+
+// Core problem:
+// The dropdown was positioned without a `relative` parent and had low stacking, so it was either hidden under other elements or blurred before clicks registered — making links unclickable.
+
+// Solution:
+// Make the parent `relative`, fix positioning with `absolute top-12 right-0`, raise `z-index`, and guard against premature blur with `onMouseDown`.

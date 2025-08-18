@@ -40,7 +40,8 @@ export async function POST(request) {
                 ? `${supporterName}: ${supporterMessage}`
                 : undefined,
             },
-            unit_amount: Math.round(Number(amount) * 100), // smallest currency unit
+            // Amount is being stored in cents.
+            unit_amount: Math.round(Number(amount) * 100),
           },
           quantity: 1,
         },

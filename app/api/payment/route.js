@@ -3,11 +3,31 @@ import dbConnect from "@/db/dbConnect";
 import Payment from "@/models/Payment";
 
 // req for getting recent payments
-export async function GET() {
+export async function GET(request) {
   await dbConnect();
+  // read username from query params (GET should not have a body)
+  const username =
+    (request?.nextUrl && request.nextUrl.searchParams.get("username")) ||
+    new URL(request.url).searchParams.get("username");
 
-  // Get the 10 most recent payments
-  const recentPayments = await Payment.find().sort({ createdAt: -1 }).limit(10);
+  if (!username) {
+    return NextResponse.json(
+      { error: "username is required" },
+      { status: 400 }
+    );
+  }
 
-  return NextResponse.json(recentPayments);
+  try {
+    // Get the 10 most recent payments
+    const recentPayments = await Payment.find({ to_user: username })
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    return NextResponse.json(recentPayments);
+  } catch (err) {
+    return NextResponse.json(
+      { error: err?.message || "Server error" },
+      { status: 500 }
+    );
+  }
 }

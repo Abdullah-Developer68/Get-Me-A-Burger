@@ -18,6 +18,7 @@ export async function GET(request) {
   }
 
   try {
+    console.log("getting payments");
     // Get the 10 most recent payments
     const recentPayments = await Payment.find({ to_user: username })
       .sort({ createdAt: -1 })

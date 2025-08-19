@@ -62,7 +62,9 @@ const Username = () => {
     );
 
     const data = await res.json();
-    setPayData(data);
+    setPayData(Array.isArray(data) ? data : []);
+    // Ensure we always store an array to avoid runtime errors when using .map
+    setPayData(Array.isArray(data) ? data : []);
     // log the response data (not the state variable immediately after setState)
     console.log("Recent payment info:", data);
   };
@@ -92,7 +94,7 @@ const Username = () => {
               <p>{username}</p>
               <p>Created animated Web novels!</p>
               <span className="flex gap-2 justify-center items-center">
-                <p>9000 Memebers .</p>
+                <p>9000 Donations .</p>
                 <p> 82 posts .</p>
                 <p> $15,424/release</p>
               </span>

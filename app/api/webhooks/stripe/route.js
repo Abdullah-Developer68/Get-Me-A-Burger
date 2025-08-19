@@ -78,6 +78,7 @@ export async function POST(request) {
             amount: Number(session.amount_total ?? 0),
           };
 
+          console.log("saving payments in the data base");
           await Payment.create(payment);
         } catch (dbErr) {
           // Log error but don't fail the webhook response

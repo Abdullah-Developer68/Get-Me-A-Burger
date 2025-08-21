@@ -6,7 +6,6 @@ import GitHub from "next-auth/providers/github";
 // import Twitter from "next-auth/providers/twitter";
 // import LinkedIn from "next-auth/providers/linkedin";
 import User from "@/models/User";
-import Payment from "@models/Payment";
 import dbConnect from "@db/dbConnect";
 
 export const authOptions = {

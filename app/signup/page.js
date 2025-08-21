@@ -1,7 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
-import { useSession, signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardAction,
@@ -11,32 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
+import { signIn, useSession } from "next-auth/react";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 
-const Login = () => {
-  const { data: session } = useSession();
-  const router = useRouter();
-
-  // React expects no side effects to run during rendering phase of the component, but can not can not stop us from doing this.
-  // First the login page renders and user clicks the login with github, so an update to session was made
-  // and on every update react will rerender the entire component now the issue is in the 2nd render phase we
-  // are immediatly redirecting to dashboard which is a side effect and it will still work but react wants it
-  // to happen after the login component finishes rendering so to avoid warnings we add the redirecting in useEffect
-  // so that redirecting happens after the rendering of the login component has been finished because session is in
-  // dependency array and rendering was caused due to its update.
-
-  // If all of this is not done then in dev mode we risk double navigation but in production it will usually work fine
-  useEffect(() => {
-    if (session) {
-      // used replace to prevent the user from going back to the login page using browser back button
-      // .push will add the login page to the browser history, so user can go back
-      router.replace("/dashboard");
-    }
-  }, [session, router]);
-
+const Signup = () => {
   return (
     <>
       <div className="flex items-center justify-center min-h-screen">
@@ -106,4 +86,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;

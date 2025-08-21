@@ -5,7 +5,7 @@ let isConnected = false;
 const dbConnect = async () => {
   if (isConnected) return;
   const mongoUri =
-    process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/Get-Me-A-Coke";
+    "mongodb+srv://abdullahdeveloper843:rQ2RTLa2XzPxtOs9@cluster0.oibzxzv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
   try {
     const conn = await mongoose.connect(mongoUri);
     isConnected = true;

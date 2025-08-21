@@ -128,7 +128,7 @@ const Username = () => {
         </div>
 
         {/*  supporters and make payments */}
-        <div className="flex justify-center items-start gap-6 mt-44 mb-10 w-4/5 text-white">
+        <div className="flex max-[600px]:flex-col justify-center items-start gap-6 mt-44 mb-10 w-4/5 text-white">
           <div className="flex flex-col gap-2">
             <div className="w-full rounded-lg bg-gray-900/70 border border-gray-700 p-5">
               <h3 className="text-lg font-semibold mb-4">Top 3 Supporters</h3>

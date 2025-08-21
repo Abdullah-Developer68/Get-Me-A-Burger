@@ -3,6 +3,7 @@
     "paths": {
       "@/*": ["./*"],
       "@components/*": ["./components/*"],
+      
       "@models/*": ["./models/*"],
       "@db/*": ["./db/*"],
       "@lib/*": ["./lib/*"]

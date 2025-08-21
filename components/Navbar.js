@@ -61,18 +61,18 @@ const Navbar = () => {
                   id="dropdown"
                   className={`${
                     showDropdown
-                      ? "z-50 absolute top-12 right-0 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700"
+                      ? "z-50 absolute top-12 right-0 bg-gray-600 divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700"
                       : "hidden"
                   }`}
                 >
                   <ul
-                    className="py-2 text-sm text-gray-700 dark:text-gray-200"
+                    className="py-2 text-sm text-black dark:text-gray-200"
                     aria-labelledby="dropdownDefaultButton"
                   >
                     <li>
                       <Link
                         href={`/`}
-                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                        className="block px-4 py-2 hover:bg-gray-100 max-w-4/5 rounded-md ml-4 dark:hover:bg-gray-600 dark:hover:text-white"
                         onClick={() => {
                           setShowDropdown(false);
                         }}
@@ -83,7 +83,7 @@ const Navbar = () => {
                     <li>
                       <Link
                         href={`/dashboard`}
-                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                        className="block px-4 py-2 hover:bg-gray-100 max-w-4/5 rounded-md ml-4 dark:hover:bg-gray-600 dark:hover:text-white"
                         onClick={() => {
                           setShowDropdown(false);
                         }}
@@ -94,7 +94,7 @@ const Navbar = () => {
                     <li>
                       <Link
                         href={`/${session.user.name}`}
-                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                        className="block px-4 py-2 hover:bg-gray-100 max-w-4/5 rounded-md ml-4 dark:hover:bg-gray-600 dark:hover:text-white"
                         onClick={() => {
                           setShowDropdown(false);
                         }}
@@ -106,7 +106,7 @@ const Navbar = () => {
                     <li className="cursor-pointer">
                       <Link
                         href={`/`}
-                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer"
+                        className="block px-4 py-2 hover:bg-gray-100 max-w-4/5 rounded-md ml-4 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer"
                         onClick={() => signOut()}
                       >
                         Sign out

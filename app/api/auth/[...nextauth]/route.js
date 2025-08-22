@@ -1,10 +1,6 @@
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
-// import Google from "next-auth/providers/google";
-// import Apple from "next-auth/providers/apple";
-// import Facebook from "next-auth/providers/facebook";
-// import Twitter from "next-auth/providers/twitter";
-// import LinkedIn from "next-auth/providers/linkedin";
+
 import User from "@/models/User";
 import dbConnect from "@db/dbConnect";
 

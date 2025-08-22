@@ -8,6 +8,8 @@ const userSchema = new Schema(
     username: { type: String, unique: true, sparse: true },
     profilePic: String,
     coverPic: String,
+    status: String,
+    otp: String,
   },
   { timestamps: true }
 );

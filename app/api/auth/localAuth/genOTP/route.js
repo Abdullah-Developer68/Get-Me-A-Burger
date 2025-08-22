@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
-
+import User from "@/models/User";
+import Username from "@/app/[username]/page";
 export async function POST(request) {
   try {
-    const { name, email } = await request.json();
+    const { name, receiverEmail } = await request.json();
 
     // create a transporter
     const transporter = nodemailer.createTransport({
@@ -17,14 +18,28 @@ export async function POST(request) {
     // generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000); // Generate a 6-digit OTP
 
+    const userExist = await User.findOne({ email: receiverEmail });
+    if (userExist) {
+      return NextResponse.json({ message: "Your account already exists" });
+    }
+
+    // create a user under the status of verifying
+    const newUser = await User.create({
+      name: "pending",
+      Username: "pending",
+      email: receiverEmail,
+      otp, // Store OTP in the user document
+      status: "verifying",
+    });
+
     // Configure Email Data
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: email, // The recipient of the email
+      to: receiverEmail, // The recipient of the email
       subject: `OTP signup:`,
       text: `
         Name: ${name}
-        Email: ${email}
+        Email: ${receiverEmail}
         Message: Use this OTP to SignUp ${otp}
       `,
     };

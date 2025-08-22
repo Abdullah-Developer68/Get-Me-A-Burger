@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
 
 const Login = () => {
   const { data: session } = useSession();
@@ -48,7 +49,7 @@ const Login = () => {
             </CardDescription>
             <CardAction>
               <Button variant="link" className="text-white">
-                Sign Up
+                <Link href="/signup">Sign Up</Link>
               </Button>
             </CardAction>
           </CardHeader>

@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import User from "@/models/User";
-import Username from "@/app/[username]/page";
+import dbConnect from "@/db/dbConnect";
+export const runtime = "nodejs";
 export async function POST(request) {
   try {
     const { name, receiverEmail } = await request.json();
+    await dbConnect();
 
     // create a transporter
     const transporter = nodemailer.createTransport({
@@ -16,7 +18,7 @@ export async function POST(request) {
     });
 
     // generate OTP
-    const otp = Math.floor(100000 + Math.random() * 900000); // Generate a 6-digit OTP
+    const otp = String(Math.floor(100000 + Math.random() * 900000)); // 6-digit OTP as string
 
     const userExist = await User.findOne({ email: receiverEmail });
     if (userExist) {
@@ -24,9 +26,9 @@ export async function POST(request) {
     }
 
     // create a user under the status of verifying
-    const newUser = await User.create({
-      name: "pending",
-      Username: "pending",
+    await User.create({
+      name: name || "pending",
+      username: "pending",
       email: receiverEmail,
       otp, // Store OTP in the user document
       status: "verifying",

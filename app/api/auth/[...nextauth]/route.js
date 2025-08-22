@@ -23,7 +23,6 @@ export const authOptions = {
         if (!existing) {
           await User.create({
             email: primaryEmail,
-            name: user?.name || profile?.name || "",
             username: primaryEmail.split("@")[0],
           });
         }

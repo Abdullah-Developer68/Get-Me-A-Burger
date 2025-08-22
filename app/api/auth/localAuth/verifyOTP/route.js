@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import User from "@/models/User";
+import dbConnect from "@/db/dbConnect";
+export const runtime = "nodejs";
 
 // This is for verifying the OTP and after this the user can login
 export async function POST(request) {
   const { email, otp } = await request.json();
+  await dbConnect();
 
   const user = await User.findOne({ email });
 
@@ -11,11 +14,12 @@ export async function POST(request) {
     return NextResponse.json({ message: "Please provide a valid email." });
   }
 
-  if (otp !== user.otp) {
+  if (String(otp) !== String(user.otp)) {
     return NextResponse.json({ message: "Invalid OTP." });
   }
 
   user.status = "active";
+  user.otp = undefined;
   await user.save();
 
   return NextResponse.json({ message: "OTP verified successfully." });

@@ -4,12 +4,12 @@ const { Schema, model, models } = mongoose;
 const userSchema = new Schema(
   {
     email: { type: String, required: true, unique: true },
-    name: { type: String, required: true },
     username: { type: String, unique: true, sparse: true },
     profilePic: String,
     coverPic: String,
     status: String,
     otp: String,
+    password: { type: String }, // hashed password for local auth
   },
   { timestamps: true }
 );

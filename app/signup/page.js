@@ -18,15 +18,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn, useSession } from "next-auth/react";
-import { use, useEffect } from "react";
-// App Router uses next/navigation; remove next/router usage
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
 const Signup = () => {
+  const router = useRouter();
   const [otpButton, setOtpButton] = useState("Send OTP");
   const [receiverEmail, setReceiverEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [password, setPassword] = useState("");
   const [showOtpBox, setShowOtpBox] = useState(false);
   const [showPassBox, setShowPassBox] = useState(false);
 
@@ -41,7 +44,7 @@ const Signup = () => {
     setOtpButton("Sending...");
 
     // send OTP request
-    const res = await fetch("/api/localAuth/genOTP", {
+    const res = await fetch("/api/auth/localAuth/genOTP", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -60,14 +63,17 @@ const Signup = () => {
   };
 
   const localSignup = async () => {
-    if (!otp || otp.length !== 6 || isNaN(Number(otp))) return;
+    if (!otp || otp.length !== 6 || isNaN(Number(otp))) {
+      alert("Please enter a valid 6-digit OTP");
+      return;
+    }
 
-    const res = await fetch("/api/localAuth/signUp", {
+    const res = await fetch("/api/auth/localAuth/verifyOTP", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name: "", receiverEmail, otp }),
+      body: JSON.stringify({ email: receiverEmail, otp }),
     });
 
     if (res.ok) {
@@ -79,7 +85,7 @@ const Signup = () => {
     }
   };
 
-  const handlePasswordSelection = async (password) => {
+  const handlePasswordSelection = async () => {
     if (password.length < 8 || password.includes(" ")) {
       alert(
         "Password must be at least 8 characters long and cannot contain spaces."
@@ -87,7 +93,20 @@ const Signup = () => {
       return;
     }
 
-    const res = await fetch();
+    const res = await fetch("/api/auth/localAuth/setPassword", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email: receiverEmail, password }),
+    });
+
+    if (res.ok) {
+      alert("Password set successfully! You can now log in.");
+      router.push("/");
+    } else {
+      alert("Password was not set please try again!");
+    }
   };
   return (
     <>
@@ -134,7 +153,7 @@ const Signup = () => {
                 <div className={`gap-2 ${showOtpBox ? "grid" : "hidden"}`}>
                   <Label htmlFor="password">Enter OTP</Label>
                   <div className="flex justify-center mt-2">
-                    <InputOTP maxLength={6}>
+                    <InputOTP maxLength={6} value={otp} onChange={setOtp}>
                       <InputOTPGroup>
                         <InputOTPSlot index={0} />
                         <InputOTPSlot index={1} />
@@ -160,8 +179,22 @@ const Signup = () => {
                       Forgot your password?
                     </a>
                   </div>
-
-                  <Input id="password" type="password" required />
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                    <Button
+                      variant="default"
+                      className="w-32"
+                      onClick={handlePasswordSelection}
+                    >
+                      Set Password
+                    </Button>
+                  </div>
                 </div>
               </div>
             </form>

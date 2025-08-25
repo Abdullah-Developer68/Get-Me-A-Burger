@@ -21,8 +21,17 @@ export async function POST(request) {
     const otp = String(Math.floor(100000 + Math.random() * 900000)); // 6-digit OTP as string
 
     const userExist = await User.findOne({ email: receiverEmail });
+
     if (userExist) {
-      return NextResponse.json({ message: "Your account already exists" });
+      // If user account is active return
+      if (userExist.status !== "verifying") {
+        return NextResponse.json({ message: "Your account already exists" });
+      } else {
+        // else update the otp
+        userExist.otp = otp;
+        await userExist.save();
+        return NextResponse.json({ message: "OTP has been resent" });
+      }
     }
 
     // create a user under the status of verifying

@@ -25,13 +25,16 @@ import Link from "next/link";
 import { useState } from "react";
 
 const Signup = () => {
+  // router
   const router = useRouter();
+  // states
   const [otpButton, setOtpButton] = useState("Send OTP");
   const [receiverEmail, setReceiverEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
   const [showOtpBox, setShowOtpBox] = useState(false);
   const [showPassBox, setShowPassBox] = useState(false);
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
 
   const sendOTP = async (e) => {
     // prevent default behaviour
@@ -62,12 +65,13 @@ const Signup = () => {
     }
   };
 
-  const localSignup = async () => {
+  // otp verification
+  const verifyOTP = async () => {
     if (!otp || otp.length !== 6 || isNaN(Number(otp))) {
       alert("Please enter a valid 6-digit OTP");
       return;
     }
-
+    // send request
     const res = await fetch("/api/auth/localAuth/verifyOTP", {
       method: "POST",
       headers: {
@@ -78,14 +82,17 @@ const Signup = () => {
 
     if (res.ok) {
       alert("OTP verified please choose a secure password!");
+      setIsOtpVerified(true);
       setShowPassBox(true);
+      // keep OTP box hidden after success
       setShowOtpBox(false);
     } else {
       alert("OTP verification failed. Please try again!");
     }
   };
 
-  const handlePasswordSelection = async () => {
+  // for final signup after OTP verified and password valid
+  const localSignup = async () => {
     if (password.length < 8 || password.includes(" ")) {
       alert(
         "Password must be at least 8 characters long and cannot contain spaces."
@@ -93,7 +100,12 @@ const Signup = () => {
       return;
     }
 
-    const res = await fetch("/api/auth/localAuth/setPassword", {
+    if (!isOtpVerified) {
+      alert("Please verify your OTP first.");
+      return;
+    }
+
+    const res = await fetch("/api/auth/localAuth/signUp", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -102,12 +114,13 @@ const Signup = () => {
     });
 
     if (res.ok) {
-      alert("Password set successfully! You can now log in.");
+      alert("Sign up successful!");
       router.push("/");
     } else {
-      alert("Password was not set please try again!");
+      alert("Sign up failed. Please try again.");
     }
   };
+
   return (
     <>
       <div className="flex items-center justify-center min-h-screen">
@@ -151,7 +164,7 @@ const Signup = () => {
 
                 {/* OTP */}
                 <div className={`gap-2 ${showOtpBox ? "grid" : "hidden"}`}>
-                  <Label htmlFor="password">Enter OTP</Label>
+                  <Label htmlFor="otp">Enter OTP</Label>
                   <div className="flex justify-center mt-2">
                     <InputOTP maxLength={6} value={otp} onChange={setOtp}>
                       <InputOTPGroup>
@@ -166,6 +179,16 @@ const Signup = () => {
                         <InputOTPSlot index={5} />
                       </InputOTPGroup>
                     </InputOTP>
+                  </div>
+                  <div className="flex justify-center mt-2">
+                    <Button
+                      variant="default"
+                      className="w-32"
+                      onClick={verifyOTP}
+                      disabled={!otp || otp.length !== 6}
+                    >
+                      {isOtpVerified ? "✓ Verified" : "Verify OTP"}
+                    </Button>
                   </div>
                 </div>
                 {/* Password */}
@@ -187,26 +210,29 @@ const Signup = () => {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
-                    <Button
-                      variant="default"
-                      className="w-32"
-                      onClick={handlePasswordSelection}
-                    >
-                      Set Password
-                    </Button>
+                    {/* No separate save button; password saved on Sign up */}
                   </div>
                 </div>
               </div>
             </form>
           </CardContent>
           <CardFooter className="flex-col gap-2">
-            <Button type="submit" className="w-full" onClick={localSignup}>
-              Sign up
+            <Button
+              type="submit"
+              className="w-full"
+              onClick={localSignup}
+              disabled={
+                !isOtpVerified || password.length < 8 || password.includes(" ")
+              }
+            >
+              {!isOtpVerified || password.length < 8 || password.includes(" ")
+                ? "Complete Steps Above"
+                : "Sign up"}
             </Button>
             <div className="flex items-center justify-center gap-2 w-full relative">
               <Button
                 variant="outline"
-                className="w-full rounded-md"
+                className="w-full rounded-md cursor-pointer"
                 onClick={() => signIn("github")}
               >
                 Sign up with Github

@@ -87,7 +87,7 @@ const Login = () => {
             <div className="flex items-center justify-center gap-2 w-full relative">
               <Button
                 variant="outline"
-                className="w-full rounded-md"
+                className="w-full rounded-md cursor-pointer"
                 onClick={() => signIn("github")}
               >
                 Login with Github

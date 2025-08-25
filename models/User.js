@@ -9,7 +9,13 @@ const userSchema = new Schema(
     coverPic: String,
     status: String,
     otp: String,
-    password: { type: String }, // hashed password for local auth
+    signMethod: { type: String, enum: ["github", "local"], required: true },
+    password: {
+      type: String,
+      required: function () {
+        return this.signMethod === "local";
+      },
+    }, // hashed password for local auth
   },
   { timestamps: true }
 );

@@ -13,22 +13,22 @@ export const authOptions = {
   ],
 
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account, profile, email, credentials }) {
       if (account.provider == "github") {
         await dbConnect();
-        const primaryEmail = user?.email || profile?.email;
-        if (!primaryEmail) return false;
-
-        const existing = await User.findOne({ email: primaryEmail });
-        if (!existing) {
-          await User.create({
-            email: primaryEmail,
-            username: primaryEmail.split("@")[0],
+        // Check if the user already exists in the database
+        const currentUser = await User.findOne({ email: email });
+        if (!currentUser) {
+          // Create a new user
+          const newUser = await User.create({
+            email: user.email,
+            username: user.email.split("@")[0],
+            signMethod: "github",
           });
         }
+        // if this is not written an error comes that you do not have permission by the app to sign in.
+        return true;
       }
-
-      return true; // if this is not written an error comes that you do not have permission by the app to sign in.
     },
     async session({ session, user, token }) {
       await dbConnect();

@@ -1,6 +1,5 @@
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
-
 import User from "@/models/User";
 import dbConnect from "@db/dbConnect";
 
@@ -13,15 +12,16 @@ export const authOptions = {
   ],
 
   callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
+    async signIn({ user, account, profile, credentials }) {
       if (account.provider == "github") {
         await dbConnect();
         // Check if the user already exists in the database
-        const currentUser = await User.findOne({ email: email });
+        const currentUser = await User.findOne({ email: user?.email });
         if (!currentUser) {
           // Create a new user
           const newUser = await User.create({
             email: user.email,
+            // fallback to email prefix. Github profile name may not be unique
             username: user.email.split("@")[0],
             signMethod: "github",
           });
@@ -30,10 +30,14 @@ export const authOptions = {
         return true;
       }
     },
-    async session({ session, user, token }) {
+    async session({ session }) {
       await dbConnect();
       const userExist = await User.findOne({ email: session.user.email });
-      if (userExist?.username) session.user.name = userExist.username;
+
+      // Only override name field (provided) in session of Auth.js if a valid username exists in DB.
+      if (userExist?.username) {
+        session.user.name = userExist.username;
+      }
       return session;
     },
     async redirect({ url, baseUrl }) {

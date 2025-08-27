@@ -41,6 +41,8 @@ export async function POST(request) {
       email: receiverEmail,
       otp, // Store OTP in the user document
       status: "verifying",
+  // Required by User schema (enum: ["github", "local"]) so local pre-signup validates
+  signMethod: "local",
     });
 
     // Configure Email Data

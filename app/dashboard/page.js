@@ -18,7 +18,7 @@ const Dashboard = () => {
 
   return (
     <div className="text-white flex justify-center">
-      <div className="w-full max-w-2xl px-4 sm:px-6 py-10 sm:py-12">
+      <div className="w-full max-w-5xl px-4 sm:px-6 py-10 sm:py-12">
         <h1 className="text-center text-2xl sm:text-3xl font-bold mb-8 sm:mb-10">
           Welcome to your Dashboard
         </h1>
@@ -57,17 +57,13 @@ const Dashboard = () => {
             />
           </div>
 
-          {/* Profile Picture: reusable component */}
           <ProfilePicturePicker />
-
-          <div>
-            <CoverPicturePicker />
-          </div>
+          <CoverPicturePicker />
 
           <div>
             <button
               type="button"
-              className="w-full rounded-md bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-2 text-sm font-medium hover:opacity-95"
+              className="w-full rounded-md bg-white text-black py-2 text-sm font-medium cursor-pointer border border-gray-300 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500"
             >
               Save
             </button>

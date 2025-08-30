@@ -4,6 +4,7 @@ import ProfilePicturePicker from "@/components/ProfilePicturePicker";
 import CoverPicturePicker from "@/components/CoverPicturePicker";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { uploadUserInfoAction } from "@/actions/uploadUserInfoAction";
 
 const Dashboard = () => {
   const { status } = useSession();
@@ -23,13 +24,14 @@ const Dashboard = () => {
           Welcome to your Dashboard
         </h1>
 
-        <form className="space-y-4 sm:space-y-5">
+        <form action={uploadUserInfoAction} className="space-y-4 sm:space-y-5">
           <div>
             <label className="block text-xs font-semibold tracking-wide text-gray-300 mb-2">
               Name
             </label>
             <input
               type="text"
+              name="name"
               placeholder="Enter name"
               className="w-full rounded-md bg-gray-800/80 border border-gray-700 px-4 py-2 text-sm placeholder-gray-400 outline-none focus:ring-2 focus:ring-gray-500"
             />
@@ -41,6 +43,7 @@ const Dashboard = () => {
             </label>
             <input
               type="email"
+              name="email"
               placeholder="Enter email"
               className="w-full rounded-md bg-gray-800/80 border border-gray-700 px-4 py-2 text-sm placeholder-gray-400 outline-none focus:ring-2 focus:ring-gray-500"
             />
@@ -52,6 +55,7 @@ const Dashboard = () => {
             </label>
             <input
               type="text"
+              name="username"
               placeholder="Enter username"
               className="w-full rounded-md bg-gray-800/80 border border-gray-700 px-4 py-2 text-sm placeholder-gray-400 outline-none focus:ring-2 focus:ring-gray-500"
             />

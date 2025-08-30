@@ -3,10 +3,10 @@
     "paths": {
       "@/*": ["./*"],
       "@components/*": ["./components/*"],
-      
       "@models/*": ["./models/*"],
       "@db/*": ["./db/*"],
-      "@lib/*": ["./lib/*"]
+      "@lib/*": ["./lib/*"],
+      "@actions/*": ["./actions/*"]
     }
   }
 }

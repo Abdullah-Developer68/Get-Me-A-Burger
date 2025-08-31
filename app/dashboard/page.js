@@ -24,7 +24,11 @@ const Dashboard = () => {
           Welcome to your Dashboard
         </h1>
 
-        <form action={uploadUserInfoAction} className="space-y-4 sm:space-y-5">
+        <form
+          action={uploadUserInfoAction}
+          className="space-y-4 sm:space-y-5"
+          encType="multipart/form-data"
+        >
           <div>
             <label className="block text-xs font-semibold tracking-wide text-gray-300 mb-2">
               Name
@@ -33,18 +37,6 @@ const Dashboard = () => {
               type="text"
               name="name"
               placeholder="Enter name"
-              className="w-full rounded-md bg-gray-800/80 border border-gray-700 px-4 py-2 text-sm placeholder-gray-400 outline-none focus:ring-2 focus:ring-gray-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold tracking-wide text-gray-300 mb-2">
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              placeholder="Enter email"
               className="w-full rounded-md bg-gray-800/80 border border-gray-700 px-4 py-2 text-sm placeholder-gray-400 outline-none focus:ring-2 focus:ring-gray-500"
             />
           </div>
@@ -61,12 +53,12 @@ const Dashboard = () => {
             />
           </div>
 
-          <ProfilePicturePicker />
-          <CoverPicturePicker />
+          <ProfilePicturePicker name="profile" />
+          <CoverPicturePicker name="cover" />
 
           <div>
             <button
-              type="button"
+              type="submit"
               className="w-full rounded-md bg-white text-black py-2 text-sm font-medium cursor-pointer border border-gray-300 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500"
             >
               Save

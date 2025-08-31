@@ -3,6 +3,7 @@ import { useState } from "react";
 
 export default function CoverPicturePicker({
   initialUrl = "/coverPage.jpg",
+  name = "cover", // name used by the enclosing form to include this file in FormData
   onChange,
 }) {
   const [preview, setPreview] = useState(initialUrl || "");
@@ -37,6 +38,7 @@ export default function CoverPicturePicker({
           <input
             type="file"
             accept="image/*"
+            name={name}
             onChange={onFileChange}
             className="hidden"
           />

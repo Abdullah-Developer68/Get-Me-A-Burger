@@ -3,6 +3,7 @@ import { useState } from "react";
 
 export default function ProfilePicturePicker({
   defaultUrl = "/profilePic.jpg",
+  name = "profile", // name used by the enclosing form to include this file in FormData
 }) {
   const [preview, setPreview] = useState(defaultUrl || "");
   const [fileName, setFileName] = useState("");
@@ -47,6 +48,7 @@ export default function ProfilePicturePicker({
           <input
             type="file"
             accept="image/*" // Only allow image files
+            name={name}
             onChange={onFileChange}
             className="hidden" // Hide default file input, use label as button
           />

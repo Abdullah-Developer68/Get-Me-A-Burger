@@ -24,11 +24,7 @@ const Dashboard = () => {
           Welcome to your Dashboard
         </h1>
 
-        <form
-          action={uploadUserInfoAction}
-          className="space-y-4 sm:space-y-5"
-          encType="multipart/form-data"
-        >
+        <form action={uploadUserInfoAction} className="space-y-4 sm:space-y-5">
           <div>
             <label className="block text-xs font-semibold tracking-wide text-gray-300 mb-2">
               Name

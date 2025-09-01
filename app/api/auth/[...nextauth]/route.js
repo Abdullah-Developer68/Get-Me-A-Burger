@@ -4,6 +4,7 @@ import User from "@/models/User";
 import dbConnect from "@db/dbConnect";
 
 export const authOptions = {
+  session: { strategy: "jwt" },
   providers: [
     GitHub({
       clientId: process.env.GITHUB_ID,
@@ -17,14 +18,18 @@ export const authOptions = {
         await dbConnect();
         // Check if the user already exists in the database
         const currentUser = await User.findOne({ email: user?.email });
+
         if (!currentUser) {
           // Create a new user
           const newUser = await User.create({
             email: user.email,
             // fallback to email prefix. Github profile name may not be unique
             username: user.email.split("@")[0],
+            name: profile.name,
             signMethod: "github",
           });
+
+          console.log("New User has been created as:" + newUser);
         }
         // if this is not written an error comes that you do not have permission by the app to sign in.
         return true;

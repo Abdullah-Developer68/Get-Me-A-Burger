@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 const Username = () => {
   // this is used to extract the URL parameters and a route/page can accept url paramters if the file is made using [filename]
@@ -13,16 +14,31 @@ const Username = () => {
       ? routeParams.username[0]
       : "creator";
 
+  const { data: session } = useSession();
+
+  // states
   const [supporterName, setSupporterName] = useState("");
   const [supporterMessage, setSupporterMessage] = useState("");
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [payData, setPayData] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
-  const [averageAmount, setAverageAmount] = useState(0);
   const [uniqueSupporters, setUniqueSupporters] = useState(0);
   const [topSupporters, setTopSupporters] = useState([]);
   const [totalDonations, setTotalDonations] = useState(0);
+  const [averageAmount, setAverageAmount] = useState(0);
+  // Do NOT read session.user during initial render; it may be undefined
+  const [profile, setProfile] = useState("");
+  const [cover, setCover] = useState("");
+
+  // Hydrate image URLs from session when available
+  useEffect(() => {
+    const u = session?.user;
+    if (!u) return;
+    // Prefer DB fields, then any legacy fields, then provider image
+    setProfile(u.profilePic || u.profileUrl || u.image || "");
+    setCover(u.coverPic || u.coverUrl || "");
+  }, [session]);
   // this sends a req to the checkout api route for donating money via stripe
   const startCheckout = async (amt) => {
     if (!amt) return;
@@ -99,7 +115,7 @@ const Username = () => {
         <div className="flex flex-col items-center relative w-full mt-0 pt-0">
           <div className="cover w-full">
             <Image
-              src="/coverPage.jpg"
+              src={cover || "/coverPage.jpg"}
               alt="cover page"
               width={1920}
               height={480}
@@ -109,7 +125,7 @@ const Username = () => {
           </div>
           <div className="profilePic absolute bottom-[-140] flex flex-col text-white justify-center items-center gap-2">
             <Image
-              src="/profilePic.jpg"
+              src={profile || "/profilePic.jpg"}
               alt="profile pic"
               width={96}
               height={96}

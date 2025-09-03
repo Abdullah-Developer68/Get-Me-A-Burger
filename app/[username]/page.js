@@ -14,7 +14,8 @@ const Username = () => {
       ? routeParams.username[0]
       : "creator";
 
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  console.log("This is the session", session);
 
   // states
   const [supporterName, setSupporterName] = useState("");
@@ -28,16 +29,16 @@ const Username = () => {
   const [totalDonations, setTotalDonations] = useState(0);
   const [averageAmount, setAverageAmount] = useState(0);
   // Do NOT read session.user during initial render; it may be undefined
-  const [profile, setProfile] = useState("");
-  const [cover, setCover] = useState("");
+  const [profile, setProfile] = useState(null);
+  const [cover, setCover] = useState(null);
 
   // Hydrate image URLs from session when available
   useEffect(() => {
     const u = session?.user;
     if (!u) return;
     // Prefer DB fields, then any legacy fields, then provider image
-    setProfile(u.profilePic || u.profileUrl || u.image || "");
-    setCover(u.coverPic || u.coverUrl || "");
+    setProfile(u.profilePic ? u.profilePic : "/profilePic.jpg");
+    setCover(u.coverPic ? u.coverPic : "/coverPage.jpg");
   }, [session]);
   // this sends a req to the checkout api route for donating money via stripe
   const startCheckout = async (amt) => {
@@ -112,36 +113,46 @@ const Username = () => {
   return (
     <>
       <div className="flex flex-col items-center w-full mt-0 pt-0">
-        <div className="flex flex-col items-center relative w-full mt-0 pt-0">
-          <div className="cover w-full">
-            <Image
-              src={cover || "/coverPage.jpg"}
-              alt="cover page"
-              width={1920}
-              height={480}
-              priority
-              className="w-full object-cover block"
-            />
-          </div>
-          <div className="profilePic absolute bottom-[-140] flex flex-col text-white justify-center items-center gap-2">
-            <Image
-              src={profile || "/profilePic.jpg"}
-              alt="profile pic"
-              width={96}
-              height={96}
-              className="w-24 rounded-full"
-            />
-            <span className="flex flex-col gap-2 items-center justify-center text-center">
-              <p>{username}</p>
-              <p>Created animated Web novels!</p>
-              <span className="flex gap-2 justify-center items-center">
-                <p>{totalDonations} Donations .</p>
-                <p> {uniqueSupporters} supporters .</p>
-                <p> ${totalAmount / 100}/release</p>
+        {status === "authenticated" && (
+          <div className="flex flex-col items-center relative w-full mt-0 pt-0">
+            <div className="cover w-full">
+              {cover ? (
+                <Image
+                  src={cover}
+                  alt="cover page"
+                  width={1920}
+                  height={480}
+                  priority
+                  className="w-full object-cover block"
+                />
+              ) : (
+                <div className="w-full h-[480px] bg-gray-800 animate-pulse" />
+              )}
+            </div>
+            <div className="profilePic absolute bottom-[-140] flex flex-col text-white justify-center items-center gap-2">
+              {profile ? (
+                <Image
+                  src={profile}
+                  alt="profile pic"
+                  width={96}
+                  height={96}
+                  className="w-24 rounded-full"
+                />
+              ) : (
+                <div className="w-24 h-24 rounded-full bg-gray-700 animate-pulse" />
+              )}
+              <span className="flex flex-col gap-2 items-center justify-center text-center">
+                <p>{username}</p>
+                <p>Created animated Web novels!</p>
+                <span className="flex gap-2 justify-center items-center">
+                  <p>{totalDonations} Donations .</p>
+                  <p> {uniqueSupporters} supporters .</p>
+                  <p> ${totalAmount / 100}/release</p>
+                </span>
               </span>
-            </span>
+            </div>
           </div>
-        </div>
+        )}
 
         {/*  supporters and make payments */}
         <div className="flex max-[600px]:flex-col justify-center items-start gap-6 mt-44 mb-10 w-4/5 text-white">

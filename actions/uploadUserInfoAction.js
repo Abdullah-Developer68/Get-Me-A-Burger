@@ -39,7 +39,6 @@ export async function uploadUserInfoAction(formData) {
 
     // Optional text fields from the form
     const name = formData.get("name")?.toString() || null;
-    const username = formData.get("username")?.toString() || null;
 
     // Files
     const profileFile = formData.get("profile");
@@ -63,7 +62,7 @@ export async function uploadUserInfoAction(formData) {
     // Build update object with only provided values
     const update = {};
     if (name) update.name = name;
-    if (username) update.username = username;
+
     if (profileUpload?.secure_url) update.profilePic = profileUpload.secure_url; // schema fields: profilePic
     if (coverUpload?.secure_url) update.coverPic = coverUpload.secure_url; // schema fields: coverPic
 
@@ -71,21 +70,13 @@ export async function uploadUserInfoAction(formData) {
     if (Object.keys(update).length === 0) {
       console.log("No changes provided. Returning current user.");
       const safe = userExists.toObject ? userExists.toObject() : userExists;
-      const {
-        _id,
-        name: n,
-        email: e,
-        username: u,
-        profilePic,
-        coverPic,
-      } = safe || {};
+      const { _id, name: n, email: e, profilePic, coverPic } = safe || {};
       return {
         ok: true,
         user: {
           _id: String(_id),
           name: n,
           email: e,
-          username: u,
           profilePic,
           coverPic,
         },
@@ -102,22 +93,14 @@ export async function uploadUserInfoAction(formData) {
     const safeUpdated = updatedUser?.toObject
       ? updatedUser.toObject()
       : updatedUser;
-    const {
-      _id,
-      name: n,
-      email: e,
-      username: u,
-      profilePic,
-      coverPic,
-    } = safeUpdated || {};
-    console.log("User info updated:", { email: e, username: u });
+    const { _id, name: n, email: e, profilePic, coverPic } = safeUpdated || {};
+    console.log("User info updated:", { email: e });
     return {
       ok: true,
       user: {
         _id: String(_id),
         name: n,
         email: e,
-        username: u,
         profilePic,
         coverPic,
       },

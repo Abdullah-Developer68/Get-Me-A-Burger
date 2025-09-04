@@ -39,8 +39,9 @@ export const authOptions = {
       await dbConnect();
       const userExist = await User.findOne({ email: session.user.email });
 
+      // Keep provider name intact; expose username as a separate field
+      if (userExist?.username) session.user.username = userExist.username;
       // Map DB fields onto the session
-      if (userExist?.username) session.user.name = userExist.username;
       if (userExist?.profilePic) session.user.profilePic = userExist.profilePic;
       if (userExist?.coverPic) session.user.coverPic = userExist.coverPic;
 

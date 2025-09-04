@@ -1,12 +1,14 @@
 "use client";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 
 export default function CoverPicturePicker({
-  initialUrl = "/coverPage.jpg",
   name = "cover", // name used by the enclosing form to include this file in FormData
-  onChange,
 }) {
-  const [preview, setPreview] = useState(initialUrl || "");
+  // Get the coverUrl from Redux store
+  const coverUrl = useSelector((state) => state.dashboard.coverUrl);
+
+  const [preview, setPreview] = useState(coverUrl || "/coverPage.jpg");
   const [fileName, setFileName] = useState("");
 
   const onFileChange = (e) => {

@@ -15,7 +15,6 @@ const Username = () => {
       : "creator";
 
   const { data: session, status } = useSession();
-  console.log("This is the session", session);
 
   // states
   const [supporterName, setSupporterName] = useState("");
@@ -40,6 +39,7 @@ const Username = () => {
     setProfile(u.profilePic ? u.profilePic : "/profilePic.jpg");
     setCover(u.coverPic ? u.coverPic : "/coverPage.jpg");
   }, [session]);
+
   // this sends a req to the checkout api route for donating money via stripe
   const startCheckout = async (amt) => {
     if (!amt) return;

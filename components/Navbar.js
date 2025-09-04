@@ -7,6 +7,7 @@ import { useSession, signOut } from "next-auth/react";
 const Navbar = () => {
   const { data: session } = useSession();
   const [showDropdown, setShowDropdown] = useState(false);
+
   return (
     <>
       <nav className="bg-gray-700 flex justify-between items-center px-4 h-12">
@@ -39,7 +40,7 @@ const Navbar = () => {
                     }, 300);
                   }}
                 >
-                  Welcome {session.user.name}
+                  Welcome {session.user.username}
                   <svg
                     className="w-2.5 h-2.5 ms-3"
                     aria-hidden="true"
@@ -93,7 +94,7 @@ const Navbar = () => {
                     </li>
                     <li>
                       <Link
-                        href={`/${session.user.name}`}
+                        href={`/${session.user.username}`}
                         className="block px-4 py-2 hover:bg-gray-100 max-w-4/5 rounded-md ml-4 dark:hover:bg-gray-600 dark:hover:text-white"
                         onClick={() => {
                           setShowDropdown(false);

@@ -1,16 +1,38 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { use, useEffect } from "react";
 import ProfilePicturePicker from "@/components/ProfilePicturePicker";
 import CoverPicturePicker from "@/components/CoverPicturePicker";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { uploadUserInfoAction } from "@/actions/uploadUserInfoAction";
+import { useDispatch } from "react-redux";
+import { setProfileUrl, setCoverUrl } from "@/redux/slices/dashboardSlice";
 
 const Dashboard = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const dispatch = useDispatch();
+
   // when the page is loaded every time it takes time for next auth to fetch the data during that time is {} is not given then in that case name and username will be undefined will not destructure and an error will come
   const { name, username } = session?.user || {};
+
+  const getUserData = async () => {
+    const res = await fetch("/api/user/data", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await res.json();
+    // send data to redux store for the values of profile and cover pics
+    dispatch(setCoverUrl(data.coverPic));
+    dispatch(setProfileUrl(data.profilePic));
+  };
+
+  useEffect(() => {
+    getUserData();
+  }, []);
+
   // Redirect unauthenticated users after commit to avoid render-phase updates
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -33,7 +55,7 @@ const Dashboard = () => {
             <input
               type="text"
               name="name"
-              placeholder={username || "Enter name"}
+              placeholder={name || "Enter name"}
               className="w-full rounded-md bg-gray-800/80 border border-gray-700 px-4 py-2 text-sm placeholder-gray-400 outline-none focus:ring-2 focus:ring-gray-500"
             />
           </div>
@@ -43,7 +65,7 @@ const Dashboard = () => {
               Username
             </label>
             <p className="w-full rounded-md bg-gray-800/80 border border-gray-700 px-4 py-2 text-sm placeholder-gray-400 outline-none focus:ring-2 focus:ring-gray-500">
-              {name}
+              {username}
             </p>
           </div>
 

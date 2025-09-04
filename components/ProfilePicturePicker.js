@@ -1,11 +1,12 @@
 "use client";
 import { useState } from "react";
-
+import { useSelector } from "react-redux";
 export default function ProfilePicturePicker({
-  defaultUrl = "/profilePic.jpg",
   name = "profile", // name used by the enclosing form to include this file in FormData
 }) {
-  const [preview, setPreview] = useState(defaultUrl || "");
+  // get the profileUrl from Redux store
+  const profileUrl = useSelector((state) => state.dashboard.profileUrl);
+  const [preview, setPreview] = useState(profileUrl || "/profilePic.jpg");
   const [fileName, setFileName] = useState("");
 
   /**

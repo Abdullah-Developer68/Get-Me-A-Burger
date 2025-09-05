@@ -1,12 +1,16 @@
 "use client";
-import React, { use, useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import ProfilePicturePicker from "@/components/ProfilePicturePicker";
 import CoverPicturePicker from "@/components/CoverPicturePicker";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { uploadUserInfoAction } from "@/actions/uploadUserInfoAction";
 import { useDispatch } from "react-redux";
-import { setProfileUrl, setCoverUrl } from "@/redux/slices/dashboardSlice";
+import {
+  setProfileUrl,
+  setCoverUrl,
+  loadFromStorage,
+} from "@/redux/slices/dashboardSlice";
 
 const Dashboard = () => {
   const { data: session, status } = useSession();
@@ -16,22 +20,46 @@ const Dashboard = () => {
   // when the page is loaded every time it takes time for next auth to fetch the data during that time is {} is not given then in that case name and username will be undefined will not destructure and an error will come
   const { name, username } = session?.user || {};
 
-  const getUserData = async () => {
-    const res = await fetch("/api/user/data", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await res.json();
-    // send data to redux store for the values of profile and cover pics
-    dispatch(setCoverUrl(data.coverPic));
-    dispatch(setProfileUrl(data.profilePic));
-  };
+  const getUserData = useCallback(async () => {
+    if (!username) return; // Don't fetch if username is not available yet
+
+    try {
+      const res = await fetch(
+        `/api/user/data?username=${encodeURIComponent(username)}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const data = await res.json();
+      // send data to redux store for the values of profile and cover pics
+      dispatch(setCoverUrl(data.coverPic || "/coverPage.jpg"));
+      dispatch(setProfileUrl(data.profilePic || "/profilePic.jpg"));
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      // Set default values on error
+      dispatch(setCoverUrl("/coverPage.jpg"));
+      dispatch(setProfileUrl("/profilePic.jpg"));
+    }
+  }, [username, dispatch]);
+
+  // Load from localStorage on component mount (client-side only). This can not be done in slice because it will be called during server side rendering also where local storage is not available
+  useEffect(() => {
+    dispatch(loadFromStorage());
+  }, [dispatch]);
 
   useEffect(() => {
-    getUserData();
-  }, []);
+    if (username) {
+      getUserData();
+    }
+  }, [username, getUserData]);
 
   // Redirect unauthenticated users after commit to avoid render-phase updates
   useEffect(() => {

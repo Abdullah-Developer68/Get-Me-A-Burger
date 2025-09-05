@@ -1,13 +1,24 @@
 "use client";
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { setProfileUrl } from "@/redux/slices/dashboardSlice";
+
 export default function ProfilePicturePicker({
   name = "profile", // name used by the enclosing form to include this file in FormData
 }) {
+  const dispatch = useDispatch();
+  const defaultUrl = "/profilePic.png";
   // get the profileUrl from Redux store
   const profileUrl = useSelector((state) => state.dashboard.profileUrl);
-  const [preview, setPreview] = useState(profileUrl || "/profilePic.jpg");
+  const [preview, setPreview] = useState(profileUrl || defaultUrl);
   const [fileName, setFileName] = useState("");
+
+  // Update preview when profileUrl from Redux changes. This handles cases where the URL is set from outside this component (e.g., loading from localStorage or API)
+  useEffect(() => {
+    if (profileUrl) {
+      setPreview(profileUrl);
+    }
+  }, [profileUrl]);
 
   /**
    * Handles file selection from input field
@@ -24,6 +35,8 @@ export default function ProfilePicturePicker({
       const url = typeof ev.target?.result === "string" ? ev.target.result : "";
       // Update preview with the generated data URL
       setPreview(url);
+      // Update Redux store with the data URL
+      dispatch(setProfileUrl(url));
     };
     // Convert file to base64 data URL
     reader.readAsDataURL(file);
@@ -31,7 +44,8 @@ export default function ProfilePicturePicker({
 
   // Clears the current selection and resets to default state
   const clearSelection = () => {
-    setPreview(defaultUrl || "");
+    setPreview(defaultUrl);
+    dispatch(setProfileUrl(defaultUrl));
     setFileName("");
   };
 
@@ -63,8 +77,8 @@ export default function ProfilePicturePicker({
           </span>
         )}
 
-        {/* Remove button - only show if a file is selected (preview != defaultUrl) */}
-        {preview && preview !== defaultUrl && (
+        {/* Remove button - only show if a file is selected (preview != default) */}
+        {preview && preview !== "/profilePic.jpg" && (
           <button
             type="button"
             onClick={clearSelection}
@@ -79,7 +93,7 @@ export default function ProfilePicturePicker({
       <div className="mt-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={preview || defaultUrl} // Show preview or fallback to default
+          src={preview || "/profilePic.jpg"} // Show preview or fallback to default
           alt="Profile preview"
           className="h-24 w-24 rounded-full object-cover border border-gray-700"
         />

@@ -1,31 +1,50 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { setCoverUrl } from "@/redux/slices/dashboardSlice";
+
+const defaultUrl = "/coverImage.PNG";
 
 export default function CoverPicturePicker({
   name = "cover", // name used by the enclosing form to include this file in FormData
 }) {
+  const dispatch = useDispatch();
   // Get the coverUrl from Redux store
   const coverUrl = useSelector((state) => state.dashboard.coverUrl);
 
-  const [preview, setPreview] = useState(coverUrl || "/coverPage.jpg");
+  const [preview, setPreview] = useState(coverUrl || defaultUrl);
   const [fileName, setFileName] = useState("");
 
+  // Update preview when coverUrl from Redux changes
+  useEffect(() => {
+    if (coverUrl) {
+      setPreview(coverUrl);
+    }
+  }, [coverUrl]);
+
   const onFileChange = (e) => {
+    // get the first file from the input
     const file = e.target.files?.[0];
     if (!file) return;
     setFileName(file.name);
+    // Create FileReader to convert file to data URL for preview
     const reader = new FileReader();
+    // defines what happens when the file is read
     reader.onload = (ev) => {
       const url = typeof ev.target?.result === "string" ? ev.target.result : "";
       setPreview(url);
+      // Update Redux store with the data URL
+      dispatch(setCoverUrl(url));
       onChange?.({ file, previewUrl: url });
     };
+    // Write the way to which the file should be read
     reader.readAsDataURL(file);
   };
 
   const clearSelection = () => {
-    setPreview(initialUrl || "");
+    setPreview(defaultUrl);
+    dispatch(setCoverUrl(defaultUrl));
     setFileName("");
     onChange?.(null);
   };
@@ -51,7 +70,7 @@ export default function CoverPicturePicker({
             {fileName}
           </span>
         )}
-        {preview && preview !== initialUrl && (
+        {preview && preview !== defaultUrl && (
           <button
             type="button"
             onClick={clearSelection}
@@ -64,7 +83,7 @@ export default function CoverPicturePicker({
       <div className="mt-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={preview || initialUrl}
+          src={preview || defaultUrl}
           alt="Cover preview"
           className="w-full h-40 sm:h-48 md:h-56 rounded-md object-cover border border-gray-700"
         />

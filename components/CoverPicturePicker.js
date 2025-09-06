@@ -36,7 +36,6 @@ export default function CoverPicturePicker({
       setPreview(url);
       // Update Redux store with the data URL
       dispatch(setCoverUrl(url));
-      onChange?.({ file, previewUrl: url });
     };
     // Write the way to which the file should be read
     reader.readAsDataURL(file);
@@ -46,7 +45,6 @@ export default function CoverPicturePicker({
     setPreview(defaultUrl);
     dispatch(setCoverUrl(defaultUrl));
     setFileName("");
-    onChange?.(null);
   };
 
   return (

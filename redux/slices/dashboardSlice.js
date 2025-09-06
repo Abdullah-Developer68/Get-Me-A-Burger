@@ -15,7 +15,8 @@ const setToLocalStorage = (key, value) => {
   }
 };
 
-// initail state is evaluated when the component is loaded and this runs in the server because of that we can not just get the items from localStorage
+// initial state is evaluated when the component is loaded and this runs in the server because of that we can not just get the items from localStorage
+// instead we will load the values from localStorage after the component mounts using a separate action
 const initialState = {
   profileUrl: null, // Will be hydrated from localStorage after component mounts
   coverUrl: null, // Will be hydrated from localStorage after component mounts

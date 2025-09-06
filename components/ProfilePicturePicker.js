@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setProfileUrl } from "@/redux/slices/dashboardSlice";
 
@@ -8,10 +8,17 @@ export default function ProfilePicturePicker({
 }) {
   const dispatch = useDispatch();
   const defaultUrl = "/profilePic.png";
+
   // get the profileUrl from Redux store
   const profileUrl = useSelector((state) => state.dashboard.profileUrl);
+
+  // Ref for the file input element
+  const fileInputRef = useRef(null);
+
+  //states
   const [preview, setPreview] = useState(profileUrl || defaultUrl);
   const [fileName, setFileName] = useState("");
+  const [removedProfile, setRemovedProfile] = useState(false); // this is used to tell the server that the profile has been removed as when the profile file is "" the server gets null
 
   // Update preview when profileUrl from Redux changes. This handles cases where the URL is set from outside this component (e.g., loading from localStorage or API)
   useEffect(() => {
@@ -28,6 +35,7 @@ export default function ProfilePicturePicker({
     const file = e.target.files?.[0];
     if (!file) return;
     setFileName(file.name);
+    setRemovedProfile(false);
 
     // Create FileReader to convert file to data URL for preview
     const reader = new FileReader();
@@ -47,6 +55,11 @@ export default function ProfilePicturePicker({
     setPreview(defaultUrl);
     dispatch(setProfileUrl(defaultUrl));
     setFileName("");
+    setRemovedProfile(true);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // Clear the file input value. This will send null to the server
+    }
   };
 
   return (
@@ -62,6 +75,7 @@ export default function ProfilePicturePicker({
         <label className="cursor-pointer inline-flex items-center gap-2 rounded-md bg-gray-800/80 border border-gray-700 px-4 py-2 text-sm hover:bg-gray-800">
           <input
             type="file"
+            ref={fileInputRef}
             accept="image/*" // Only allow image files
             name={name}
             onChange={onFileChange}
@@ -69,7 +83,12 @@ export default function ProfilePicturePicker({
           />
           <span>Select Image</span>
         </label>
-
+        {/* true and false can be sent but the server will interpret them as strings so it is better to send them as that data type from the start */}
+        <input
+          type="hidden"
+          name="profileRemoved"
+          value={removedProfile ? "true" : "false"}
+        />
         {/* Display selected filename if a file is chosen */}
         {fileName && (
           <span className="text-xs text-gray-400 truncate max-w-[200px]">
@@ -78,7 +97,7 @@ export default function ProfilePicturePicker({
         )}
 
         {/* Remove button - only show if a file is selected (preview != default) */}
-        {preview && preview !== "/profilePic.jpg" && (
+        {preview && preview !== defaultUrl && (
           <button
             type="button"
             onClick={clearSelection}
@@ -93,7 +112,7 @@ export default function ProfilePicturePicker({
       <div className="mt-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={preview || "/profilePic.jpg"} // Show preview or fallback to default
+          src={preview || defaultUrl} // Show preview or fallback to default
           alt="Profile preview"
           className="h-24 w-24 rounded-full object-cover border border-gray-700"
         />

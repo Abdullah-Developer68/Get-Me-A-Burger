@@ -36,8 +36,8 @@ const Username = () => {
     const u = session?.user;
     if (!u) return;
     // Prefer DB fields, then any legacy fields, then provider image
-    setProfile(u.profilePic ? u.profilePic : "/profilePic.jpg");
-    setCover(u.coverPic ? u.coverPic : "/coverPage.jpg");
+    setProfile(u.profilePic ? u.profilePic : "/profilePic.png");
+    setCover(u.coverPic ? u.coverPic : "/coverImage.PNG");
   }, [session]);
 
   // this sends a req to the checkout api route for donating money via stripe

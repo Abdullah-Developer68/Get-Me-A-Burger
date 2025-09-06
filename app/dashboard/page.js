@@ -40,13 +40,13 @@ const Dashboard = () => {
 
       const data = await res.json();
       // send data to redux store for the values of profile and cover pics
-      dispatch(setCoverUrl(data.coverPic || "/coverPage.jpg"));
-      dispatch(setProfileUrl(data.profilePic || "/profilePic.jpg"));
+      dispatch(setCoverUrl(data.coverPic || "/coverImage.PNG"));
+      dispatch(setProfileUrl(data.profilePic || "/profilePic.png"));
     } catch (error) {
       console.error("Error fetching user data:", error);
       // Set default values on error
-      dispatch(setCoverUrl("/coverPage.jpg"));
-      dispatch(setProfileUrl("/profilePic.jpg"));
+      dispatch(setCoverUrl("/coverImage.PNG"));
+      dispatch(setProfileUrl("/profilePic.png"));
     }
   }, [username, dispatch]);
 

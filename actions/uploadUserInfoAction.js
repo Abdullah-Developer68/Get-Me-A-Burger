@@ -30,6 +30,7 @@ async function uploadToCloudinary(file, folder) {
 export async function uploadUserInfoAction(formData) {
   try {
     console.log("Uploading user info...");
+    console.log(formData);
     // Ensure DB connection
     await dbConnect();
 
@@ -44,6 +45,10 @@ export async function uploadUserInfoAction(formData) {
     const profileFile = formData.get("profile");
     const coverFile = formData.get("cover");
 
+    // Flags from the form to signal explicit removal of images
+    const profileRemoved = formData.get("profileRemoved") === "true";
+    const coverRemoved = formData.get("coverRemoved") === "true";
+
     if (!email) {
       return { ok: false, error: "Not authenticated" };
     }
@@ -53,24 +58,42 @@ export async function uploadUserInfoAction(formData) {
       return { ok: false, error: "User does not exist" };
     }
 
-    // Upload in parallel (if provided)
+    const DEFAULTS = {
+      profilePic: "/profilePic.png",
+      coverPic: "/coverImage.PNG",
+    };
+
+    // Upload in parallel (if provided). If user explicitly removed, do not upload; just set default
     const [profileUpload, coverUpload] = await Promise.all([
-      uploadToCloudinary(profileFile, "get-me-a-coke/profile"),
-      uploadToCloudinary(coverFile, "get-me-a-coke/cover"),
+      profileRemoved
+        ? null
+        : uploadToCloudinary(profileFile, "get-me-a-coke/profile"),
+      coverRemoved
+        ? null
+        : uploadToCloudinary(coverFile, "get-me-a-coke/cover"),
     ]);
 
     // Build update object with only provided values
     const update = {};
     if (name) update.name = name;
 
-    if (profileUpload?.secure_url) update.profilePic = profileUpload.secure_url; // schema fields: profilePic
-    if (coverUpload?.secure_url) update.coverPic = coverUpload.secure_url; // schema fields: coverPic
+    if (profileUpload?.secure_url) {
+      update.profilePic = profileUpload.secure_url; // schema fields: profilePic
+    } else if (profileRemoved) {
+      update.profilePic = DEFAULTS.profilePic;
+    }
+
+    if (coverUpload?.secure_url) {
+      update.coverPic = coverUpload.secure_url; // schema fields: coverPic
+    } else if (coverRemoved) {
+      update.coverPic = DEFAULTS.coverPic;
+    }
 
     // If nothing to update, return current user (as plain object)
     if (Object.keys(update).length === 0) {
-      console.log("No changes provided. Returning current user.");
       const safe = userExists.toObject ? userExists.toObject() : userExists;
       const { _id, name: n, email: e, profilePic, coverPic } = safe || {};
+
       return {
         ok: true,
         user: {

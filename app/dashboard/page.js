@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { uploadUserInfoAction } from "@/actions/uploadUserInfoAction";
 import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import {
   setProfileUrl,
   setCoverUrl,
@@ -16,6 +17,11 @@ const Dashboard = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
   const dispatch = useDispatch();
+
+  const potentialProfile = useSelector(
+    (state) => state.dashboard.potentialProfile
+  );
+  const potentialCover = useSelector((state) => state.dashboard.potentialCover);
 
   // when the page is loaded every time it takes time for next auth to fetch the data during that time is {} is not given then in that case name and username will be undefined will not destructure and an error will come
   const { name, username } = session?.user || {};
@@ -39,9 +45,9 @@ const Dashboard = () => {
       }
 
       const data = await res.json();
-      // send data to redux store for the values of profile and cover pics
-      dispatch(setCoverUrl(data.coverPic || "/coverImage.PNG"));
+
       dispatch(setProfileUrl(data.profilePic || "/profilePic.png"));
+      dispatch(setCoverUrl(data.coverPic || "/coverImage.PNG"));
     } catch (error) {
       console.error("Error fetching user data:", error);
       // Set default values on error
@@ -57,6 +63,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (username) {
+      console.log("Fetching user data for:", username);
       getUserData();
     }
   }, [username, getUserData]);

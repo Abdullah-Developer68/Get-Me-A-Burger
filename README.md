@@ -7,3 +7,5 @@
 3.  After this check ways to improve navigation speed.
 
 4.  Create a Web Socket connection with the users and the creators so that the payments donated are shared in real time!
+
+5.  Deploy it on Vercel and make sure to use vercel queues in case the database operations are intense and due to cold start the server starts very slowly.

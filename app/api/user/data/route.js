@@ -17,6 +17,7 @@ export const GET = async (request) => {
 
     await dbConnect();
     const user = await User.findOne({ username });
+
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
@@ -24,10 +25,13 @@ export const GET = async (request) => {
     // Return the user data directly (not wrapped in user object)
     return NextResponse.json(
       {
-        coverPic: user.coverPic,
-        profilePic: user.profilePic,
-        name: user.name,
-        username: user.username,
+        // return only specific fields
+        user: {
+          coverPic: user.coverPic,
+          profilePic: user.profilePic,
+          name: user.name,
+          username: user.username,
+        },
       },
       { status: 200 }
     );

@@ -10,4 +10,4 @@
 
 5.  Deploy it on Vercel and make sure to use vercel queues in case the database operations are intense and due to cold start the server starts very slowly.
 
-6.
+6. Create a feature in which the creators can see all the analytics relevant to them.

@@ -6,7 +6,10 @@
       "@models/*": ["./models/*"],
       "@db/*": ["./db/*"],
       "@lib/*": ["./lib/*"],
-      "@actions/*": ["./actions/*"]
+      "@actions/*": ["./actions/*"],
+      "@hooks/*": ["./hooks/*"],
+      "@redux/*": ["./redux/*"],
+      "@contexts/*": ["./contexts/*"]
     }
   }
 }

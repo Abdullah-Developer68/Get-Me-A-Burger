@@ -3,9 +3,9 @@ import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setProfileUrl } from "@/redux/slices/dashboardSlice";
 
-export default function ProfilePicturePicker({
+const ProfilePicturePicker = ({
   name = "profile", // name used by the enclosing form to include this file in FormData
-}) {
+}) => {
   const dispatch = useDispatch();
   const defaultUrl = "/profilePic.png";
 
@@ -119,4 +119,6 @@ export default function ProfilePicturePicker({
       </div>
     </div>
   );
-}
+};
+
+export default ProfilePicturePicker;

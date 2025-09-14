@@ -1,6 +1,5 @@
 ## Todo:
-
-1.  Create Auth Context and in that store user details in localStorage and only fetch user data when ever the username changes this will resolve the issue of data retention in dashboard page.
+1. - [x]  Create Auth Context and in that store user details in localStorage and only fetch user data when ever the username changes this will resolve the issue of data retention in dashboard page.
 
 > PS: the first step has been done know based on the data received make sure that the data on the dashboard is saved on changes.
 

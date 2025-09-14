@@ -1,62 +1,23 @@
 "use client";
 import { createContext, useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { store } from "@/redux/store";
+import { set } from "mongoose";
 
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
+  const { data: session, status } = useSession();
+  // console.log("Session data in AuthProvider:", session, status);
   const [userInfo, setUserInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize userInfo from localStorage on mount
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("user");
-      if (stored) {
-        try {
-          setUserInfo(JSON.parse(stored));
-        } catch (error) {
-          console.error("Error parsing stored user data:", error);
-          localStorage.removeItem("user");
-        }
-      }
-      setIsLoading(false);
-    }
-  }, []);
-
-  const getUserData = async (username) => {
-    if (!username) return;
-
-    try {
-      const res = await fetch(
-        `/api/user/data/?username=${encodeURIComponent(username)}`, // Fixed API path
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-
-      const data = await res.json();
-
-      if (data.user) {
-        setUserInfo(data.user);
-        // save the data to local storage
-        localStorage.setItem("user", JSON.stringify(data.user));
-        localStorage.setItem("username", data.user.username);
-        localStorage.setItem("profilePic", data.user.profilePic || "");
-        localStorage.setItem("coverPic", data.user.coverPic || "");
-      } else {
-        console.error("User data not found in response");
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  };
-
   const storeDataOnLogin = (userData) => {
+    if (!userData) {
+      setUserInfo(null);
+      return;
+    }
+
     setUserInfo(userData);
     localStorage.setItem("user", JSON.stringify(userData));
     localStorage.setItem("username", userData.username);
@@ -73,14 +34,49 @@ const AuthProvider = ({ children }) => {
     localStorage.removeItem("coverPic");
   };
 
+  const loadFromStorage = () => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("user");
+      if (stored) {
+        try {
+          setUserInfo(JSON.parse(stored));
+        } catch (error) {
+          console.error("Error parsing stored user data:", error);
+          localStorage.removeItem("user");
+        }
+      }
+    }
+  };
+
+  // Initialize from localStorage on mount - runs once
+  useEffect(() => {
+    loadFromStorage();
+  }, []);
+
+  // Handle session changes - depend on session, not userInfo
+  useEffect(() => {
+    if (status === "loading") {
+      setIsLoading(true);
+      return;
+    }
+
+    if (session?.user) {
+      storeDataOnLogin(session.user);
+    } else if (status === "unauthenticated") {
+      clearDataOnLogout();
+    }
+    setIsLoading(false);
+  }, [session, status]);
+
   return (
     <AuthContext.Provider
       value={{
         userInfo,
-        getUserData,
         storeDataOnLogin,
         clearDataOnLogout,
+        loadFromStorage,
         isLoading,
+        status,
       }}
     >
       {children}

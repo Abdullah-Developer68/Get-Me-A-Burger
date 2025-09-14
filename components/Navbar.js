@@ -3,15 +3,23 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
+import useAuth from "@/hooks/useAuth"; // Import your custom hook
 
 const Navbar = () => {
   const { data: session } = useSession();
+  const { userInfo, clearDataOnLogout, isLoading } = useAuth(); // Access context values
   const [showDropdown, setShowDropdown] = useState(false);
+
+  // Handle sign-out: Clear custom data first, then NextAuth sign-out
+  const handleSignOut = () => {
+    clearDataOnLogout(); // Clear your custom auth data
+    signOut(); // Then sign out from NextAuth
+  };
 
   return (
     <>
       <nav className="bg-gray-700 flex justify-between items-center px-4 h-12">
-        {/* Drop down */}
+        {/* Logo */}
         <div className="flex items-center gap-2">
           <Image
             src="/logo.jpg"
@@ -21,10 +29,10 @@ const Navbar = () => {
             className="rounded-full"
             priority
           />
-          <div className="logo  font-bold">Get me a Coke</div>
+          <div className="logo font-bold">Get me a Coke</div>
         </div>
 
-        {session ? (
+        {session && !isLoading ? ( // Check session and loading state
           <>
             <div className="flex items-center gap-3">
               <div className="flex flex-col items-center gap-3 relative">
@@ -40,7 +48,8 @@ const Navbar = () => {
                     }, 300);
                   }}
                 >
-                  Welcome {session.user.username}
+                  Welcome {userInfo?.username || session.user.username}{" "}
+                  {/* Fallback to session if userInfo is null */}
                   <svg
                     className="w-2.5 h-2.5 ms-3"
                     aria-hidden="true"
@@ -94,7 +103,7 @@ const Navbar = () => {
                     </li>
                     <li>
                       <Link
-                        href={`/${session.user.username}`}
+                        href={`/${userInfo?.username || session.user.username}`} // Use userInfo if available
                         className="block px-4 py-2 hover:bg-gray-100 max-w-4/5 rounded-md ml-4 dark:hover:bg-gray-600 dark:hover:text-white"
                         onClick={() => {
                           setShowDropdown(false);
@@ -108,7 +117,10 @@ const Navbar = () => {
                       <Link
                         href={`/`}
                         className="block px-4 py-2 hover:bg-gray-100 max-w-4/5 rounded-md ml-4 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer"
-                        onClick={() => signOut()}
+                        onClick={() => {
+                          setShowDropdown(false);
+                          handleSignOut(); // Use the new handler
+                        }}
                       >
                         Sign out
                       </Link>

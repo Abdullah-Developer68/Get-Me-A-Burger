@@ -27,9 +27,9 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>
-          <ReduxProvider>
-            <SessionWrapper>
+        <SessionWrapper>
+          <AuthProvider>
+            <ReduxProvider>
               <Navbar />
 
               <div className="relative min-h-screen bg-black">
@@ -39,9 +39,9 @@ export default function RootLayout({ children }) {
               </div>
 
               <Footer />
-            </SessionWrapper>
-          </ReduxProvider>
-        </AuthProvider>
+            </ReduxProvider>
+          </AuthProvider>
+        </SessionWrapper>
       </body>
     </html>
   );

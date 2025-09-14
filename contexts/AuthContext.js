@@ -8,20 +8,37 @@ const AuthProvider = ({ children }) => {
   );
 
   const getUserData = async () => {
-    const res = await fetch("/app/api/user/data/route.js", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
+    try {
+      const res = await fetch(
+        `/app/api/user/data/?username=${encodeURIComponent(username)}`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      const data = await res.json();
+      setUserInfo(data.user);
 
-    const data = await res.json();
-    setUserInfo(data.user);
-
-    // save the data to local storage
-    localStorage.setItem("user", JSON.stringify(data.user));
+      // save the data to local storage
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("username", data.user.username);
+      localStorage.setItem("profilePic", data.user.profilePic);
+      localStorage.setItem("coverPic", data.user.coverPic);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      // clear local storage on error
+      setUserInfo(null);
+      localStorage.removeItem("user");
+      localStorage.removeItem("username");
+      localStorage.removeItem("profilePic");
+      localStorage.removeItem("coverPic");
+    }
   };
 
   // fetch new details when username changes
   useEffect(() => {
+    // remove previous user details from local storage
+    localStorage.clear();
     getUserData();
   }, [userInfo.user.username]);
 

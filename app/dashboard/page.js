@@ -18,12 +18,9 @@ const Dashboard = () => {
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const potentialProfile = useSelector(
-    (state) => state.dashboard.potentialProfile
-  );
-  const potentialCover = useSelector((state) => state.dashboard.potentialCover);
-
-  // when the page is loaded every time it takes time for next auth to fetch the data during that time is {} is not given then in that case name and username will be undefined will not destructure and an error will come
+  // when the page is loaded every time it takes time for next auth to fetch
+  // the data during that time is {} is not given then in that case name and
+  // username will be undefined & will not destructure and an error will come.
   const { name, username } = session?.user || {};
 
   const getUserData = useCallback(async () => {
@@ -56,8 +53,11 @@ const Dashboard = () => {
     }
   }, [username, dispatch]);
 
-  // Load from localStorage on component mount (client-side only). This can not be done in slice because it will be called during server side rendering also where local storage is not available
+  // Load localStorage on component mount (client-side only).
+  // This can not be done in slice because it will be called during
+  // server side rendering also where local storage is not available
   useEffect(() => {
+    // This sets the values in the redux store from local storage
     dispatch(loadFromStorage());
   }, [dispatch]);
 

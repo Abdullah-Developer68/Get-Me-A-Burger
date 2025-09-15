@@ -1,31 +1,32 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { setProfileUrl } from "@/redux/slices/dashboardSlice";
+import useAuth from "@/hooks/useAuth";
 
 const ProfilePicturePicker = ({
   name = "profile", // name used by the enclosing form to include this file in FormData
 }) => {
-  const dispatch = useDispatch();
+  const [userInfo, status] = useAuth();
   const defaultUrl = "/profilePic.png";
-
-  // get the profileUrl from Redux store
-  const profileUrl = useSelector((state) => state.dashboard.profileUrl);
 
   // Ref for the file input element
   const fileInputRef = useRef(null);
 
   //states
-  const [preview, setPreview] = useState(profileUrl || defaultUrl);
+  const [preview, setPreview] = useState(defaultUrl);
   const [fileName, setFileName] = useState("");
   const [removedProfile, setRemovedProfile] = useState(false); // this is used to tell the server that the profile has been removed as when the profile file is "" the server gets null
 
   // Update preview when profileUrl from Redux changes. This handles cases where the URL is set from outside this component (e.g., loading from localStorage or API)
   useEffect(() => {
+    const savedProfilePic = userInfo?.profilePic;
+    const profileUrl =
+      savedProfilePic && savedProfilePic !== "null"
+        ? savedProfilePic
+        : defaultUrl;
     if (profileUrl) {
       setPreview(profileUrl);
     }
-  }, [profileUrl]);
+  }, [userInfo]);
 
   /**
    * Handles file selection from input field

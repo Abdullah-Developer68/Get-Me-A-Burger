@@ -1,22 +1,14 @@
 "use client";
-import React, { useEffect, useCallback } from "react";
+import { useEffect } from "react";
 import ProfilePicturePicker from "@/components/ProfilePicturePicker";
 import CoverPicturePicker from "@/components/CoverPicturePicker";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { uploadUserInfoAction } from "@/actions/uploadUserInfoAction";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
-import {
-  setProfileUrl,
-  setCoverUrl,
-  loadFromStorage,
-} from "@/redux/slices/dashboardSlice";
 import useAuth from "@/hooks/useAuth";
 
 const Dashboard = () => {
   const { userInfo, status } = useAuth();
-
+  console.log("UserInfo in Dashboard:", userInfo, status);
   const router = useRouter();
 
   // Redirect unauthenticated users after commit to avoid render-phase updates

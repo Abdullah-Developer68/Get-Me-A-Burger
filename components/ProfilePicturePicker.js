@@ -5,7 +5,7 @@ import useAuth from "@/hooks/useAuth";
 const ProfilePicturePicker = ({
   name = "profile", // name used by the enclosing form to include this file in FormData
 }) => {
-  const [userInfo, status] = useAuth();
+  const { userInfo } = useAuth();
   const defaultUrl = "/profilePic.png";
 
   // Ref for the file input element

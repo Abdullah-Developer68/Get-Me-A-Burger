@@ -9,7 +9,8 @@
       "@actions/*": ["./actions/*"],
       "@hooks/*": ["./hooks/*"],
       "@redux/*": ["./redux/*"],
-      "@contexts/*": ["./contexts/*"]
+      "@contexts/*": ["./contexts/*"],
+      "@providers/*": ["./providers/*"]
     }
   }
 }

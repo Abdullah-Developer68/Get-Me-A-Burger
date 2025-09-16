@@ -1,8 +1,6 @@
 "use client";
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { store } from "@/redux/store";
-import { set } from "mongoose";
 
 const AuthContext = createContext();
 
@@ -11,8 +9,9 @@ const AuthProvider = ({ children }) => {
   // console.log("Session data in AuthProvider:", session, status);
   const [userInfo, setUserInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const hasInitializedFromStorage = useRef(false);
 
-  const storeDataOnLogin = (userData) => {
+  const storeDataOnLogin = useCallback((userData) => {
     if (!userData) {
       setUserInfo(null);
       return;
@@ -20,19 +19,13 @@ const AuthProvider = ({ children }) => {
 
     setUserInfo(userData);
     localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("username", userData.username);
-    localStorage.setItem("profilePic", userData.profilePic || "");
-    localStorage.setItem("coverPic", userData.coverPic || "");
-  };
+  }, []);
 
-  const clearDataOnLogout = () => {
+  const clearDataOnLogout = useCallback(() => {
     // clear user info and specific localStorage items on logout
     setUserInfo(null);
     localStorage.removeItem("user");
-    localStorage.removeItem("username");
-    localStorage.removeItem("profilePic");
-    localStorage.removeItem("coverPic");
-  };
+  }, []);
 
   const loadFromStorage = () => {
     if (typeof window !== "undefined") {
@@ -51,30 +44,33 @@ const AuthProvider = ({ children }) => {
   // Initialize from localStorage on mount - runs once
   useEffect(() => {
     loadFromStorage();
+    hasInitializedFromStorage.current = true;
+    setIsLoading(false);
   }, []);
 
-  // Handle session changes - depend on session, not userInfo
+  // Handle session changes - only update on fresh login, not refresh
   useEffect(() => {
     if (status === "loading") {
-      setIsLoading(true);
       return;
     }
 
-    if (session?.user) {
-      storeDataOnLogin(session.user);
+    if (status === "authenticated" && session?.user) {
+      // Only update if we haven't initialized from storage yet (fresh login)
+      // On page refresh, hasInitializedFromStorage will be true, so don't overwrite
+      if (!hasInitializedFromStorage.current || !userInfo) {
+        storeDataOnLogin(session.user);
+        hasInitializedFromStorage.current = true;
+      }
     } else if (status === "unauthenticated") {
       clearDataOnLogout();
+      hasInitializedFromStorage.current = false;
     }
-    setIsLoading(false);
-  }, [session, status]);
+  }, [status, session?.user, userInfo, clearDataOnLogout, storeDataOnLogin]); // Include all dependencies
 
   return (
     <AuthContext.Provider
       value={{
         userInfo,
-        storeDataOnLogin,
-        clearDataOnLogout,
-        loadFromStorage,
         isLoading,
         status,
       }}

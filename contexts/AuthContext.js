@@ -9,7 +9,6 @@ const AuthProvider = ({ children }) => {
   // console.log("Session data in AuthProvider:", session, status);
   const [userInfo, setUserInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const hasInitializedFromStorage = useRef(false);
 
   const storeDataOnLogin = useCallback((userData) => {
     if (!userData) {
@@ -44,28 +43,8 @@ const AuthProvider = ({ children }) => {
   // Initialize from localStorage on mount - runs once
   useEffect(() => {
     loadFromStorage();
-    hasInitializedFromStorage.current = true;
     setIsLoading(false);
   }, []);
-
-  // Handle session changes - only update on fresh login, not refresh
-  useEffect(() => {
-    if (status === "loading") {
-      return;
-    }
-
-    if (status === "authenticated" && session?.user) {
-      // Only update if we haven't initialized from storage yet (fresh login)
-      // On page refresh, hasInitializedFromStorage will be true, so don't overwrite
-      if (!hasInitializedFromStorage.current || !userInfo) {
-        storeDataOnLogin(session.user);
-        hasInitializedFromStorage.current = true;
-      }
-    } else if (status === "unauthenticated") {
-      clearDataOnLogout();
-      hasInitializedFromStorage.current = false;
-    }
-  }, [status, session?.user, userInfo, clearDataOnLogout, storeDataOnLogin]); // Include all dependencies
 
   return (
     <AuthContext.Provider

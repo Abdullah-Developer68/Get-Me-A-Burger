@@ -26,12 +26,10 @@ export const GET = async (request) => {
     return NextResponse.json(
       {
         // return only specific fields
-        user: {
-          coverPic: user.coverPic,
-          profilePic: user.profilePic,
-          name: user.name,
-          username: user.username,
-        },
+        coverPic: user.coverPic,
+        profilePic: user.profilePic,
+        name: user.name,
+        username: user.username,
       },
       { status: 200 }
     );

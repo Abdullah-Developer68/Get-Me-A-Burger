@@ -6,7 +6,7 @@ const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const { data: session, status } = useSession();
-  const [userInfo, setUserInfo] = useState(null);
+  const [userInfo, setuserInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // when ever a re-render happens the function is re-created with a new memory
@@ -16,12 +16,12 @@ const AuthProvider = ({ children }) => {
   const storeDataOnLogin = useCallback((userData) => {
     console.log(userData);
     if (!userData) {
-      setUserInfo(null);
-      localStorage.removeItem("user");
+      setuserInfo(null);
+      localStorage.removeItem("userInfo");
       return;
     }
     // update only if any of the fields have actually changed
-    setUserInfo((prev) => {
+    setuserInfo((prev) => {
       if (
         !prev ||
         prev.name !== userData.name ||
@@ -31,7 +31,7 @@ const AuthProvider = ({ children }) => {
         prev.profilePic !== userData.profilePic ||
         prev.coverPic !== userData.coverPic
       ) {
-        localStorage.setItem("user", JSON.stringify(userData));
+        localStorage.setItem("userInfo", JSON.stringify(userData));
         return userData;
       }
       return prev;
@@ -39,19 +39,22 @@ const AuthProvider = ({ children }) => {
   }, []);
 
   const clearDataOnLogout = useCallback(() => {
-    setUserInfo(null);
-    localStorage.removeItem("user");
+    setuserInfo(null);
+    localStorage.removeItem("userInfo");
   }, []);
 
+  // when user refreshes the page
   const loadFromStorage = useCallback(() => {
     if (typeof window === "undefined") return;
-    const stored = localStorage.getItem("user");
+    console.log("Loading user data from local storage");
+    const stored = localStorage.getItem("userInfo");
+
     if (stored) {
       try {
-        setUserInfo(JSON.parse(stored));
+        setuserInfo(JSON.parse(stored));
       } catch (error) {
         console.error("Error parsing stored user data:", error);
-        localStorage.removeItem("user");
+        localStorage.removeItem("userInfo");
       }
     }
   }, []);
@@ -60,7 +63,10 @@ const AuthProvider = ({ children }) => {
     if (status === "authenticated" && session?.user) {
       storeDataOnLogin(session.user);
     }
-  }, [status, session, storeDataOnLogin]);
+    if (status === "unauthenticated") {
+      clearDataOnLogout();
+    }
+  }, [status, session, storeDataOnLogin, clearDataOnLogout]);
 
   useEffect(() => {
     loadFromStorage();
